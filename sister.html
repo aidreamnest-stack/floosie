@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Floosie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;600;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- Automatic Color Changing Engine --- */
+        :root {
+            /* These variables will change automatically via animation */
+            --bg-start: #ff9a9e;
+            --bg-end: #fecfef;
+            --text-accent: #ff69b4;
+            --card-glow: rgba(255, 105, 180, 0.3);
+            
+            animation: colorCycle 15s infinite alternate;
+        }
+
+        @keyframes colorCycle {
+            0% {
+                --bg-start: #ff9a9e; --bg-end: #fecfef; /* Pink/Peach */
+                --text-accent: #ff69b4; --card-glow: rgba(255, 105, 180, 0.3);
+            }
+            33% {
+                --bg-start: #a18cd1; --bg-end: #fbc2eb; /* Lavender/Purple */
+                --text-accent: #9b59b6; --card-glow: rgba(155, 89, 182, 0.3);
+            }
+            66% {
+                --bg-start: #84fab0; --bg-end: #8fd3f4; /* Mint/Blue */
+                --text-accent: #2ecc71; --card-glow: rgba(46, 204, 113, 0.3);
+            }
+            100% {
+                --bg-start: #f6d365; --bg-end: #fda085; /* Gold/Orange */
+                --text-accent: #e67e22; --card-glow: rgba(230, 126, 34, 0.3);
+            }
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 1s ease;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* --- The Glass Card --- */
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 3rem;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1), 0 0 30px var(--card-glow);
+            text-align: center;
+            z-index: 10;
+            max-width: 90%;
+            width: 400px;
+            border: 2px solid rgba(255,255,255,0.8);
+            animation: cardFloat 6s ease-in-out infinite;
+        }
+
+        .small-text {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* --- The "Character" Name Animation --- */
+        .name-container {
+            height: 150px; /* Reserve space so it doesn't push other text */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .name {
+            font-family: 'Pacifico', cursive;
+            font-size: 5rem;
+            color: var(--text-accent);
+            text-shadow: 3px 3px 0px #fff, 5px 5px 15px rgba(0,0,0,0.15);
+            
+            /* The Animation Settings */
+            animation: bigSmallCharacter 2s infinite ease-in-out;
+            cursor: default;
+        }
+
+        .message {
+            font-size: 1.5rem;
+            color: #444;
+            margin-top: 10px;
+        }
+
+        .no-limit {
+            font-weight: 900;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            background: linear-gradient(to right, var(--text-accent), #ffcb05);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+            margin-top: 5px;
+            letter-spacing: 2px;
+        }
+
+        .signature {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- Animations --- */
+        
+        /* This makes the name scale BIG and SMALL like a breathing character */
+        @keyframes bigSmallCharacter {
+            0% {
+                transform: scale(1) rotate(0deg);
+            }
+            50% {
+                /* Gets BIG and tilts slightly */
+                transform: scale(1.5) rotate(-5deg);
+                filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="bgCanvas"></canvas>
+
+    <div class="card">
+        <div class="small-text">To my amazing sister</div>
+        
+        <div class="name-container">
+            <div class="name">Floosie</div>
+        </div>
+        
+        <div class="message">
+            I love you so much
+            <span class="no-limit">NO LIMIT</span>
+        </div>
+
+        <div class="signature">
+            From your Brother
+        </div>
+    </div>
+
+    <script>
+        // Floating bubbles background for extra polish
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Bubble {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                this.x = Math.random() * width;
+                this.y = height + Math.random() * 100;
+                this.size = Math.random() * 40 + 10;
+                this.speed = Math.random() * 2 + 1;
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+
+            update() {
+                this.y -= this.speed;
+                if (this.y < -50) {
+                    this.init();
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.fill();
+            }
+        }
+
+        const bubbles = [];
+        for (let i = 0; i < 50; i++) {
+            bubbles.push(new Bubble());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            bubbles.forEach(b => {
+                b.update();
+                b.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
